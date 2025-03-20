@@ -1,11 +1,11 @@
 -workspace-templates \
-    bndtools/workspace-templates/osgi; \
+    peterkir/bnd-workspace-template//osgi; \
         name=osgi-felix; \
         description="OSGi R8 with Felix distribution", \
-    bndtools/workspace-templates/eclipse-4.35-platform; \
+    peterkir/bnd-workspace-template/eclipse-4.35-platform; \
         name=osgi_eclipse_4.35_platform; \
         description="OSGi R8 with Eclipse Platform distribution", \
-    bndtools/workspace-templates/eclipse-4.35-simurel; \
+    peterkir/bnd-workspace-template/eclipse-4.35-simurel; \
         name=osgi_eclipse_4.35_2025-03_simurel; \
         description="OSGi R8 with Eclipse SimuRel distribution"
 
