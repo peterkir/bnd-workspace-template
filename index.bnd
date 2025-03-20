@@ -1,10 +1,4 @@
 -workspace-templates \
-    bndtools/workspace-templates/gradle; \
-        name=gradle; \
-        description="Setup gradle build for bnd workspace", \
-    bndtools/workspace-templates/maven; \
-        name=maven; \
-        description="Use the maven directory layout for sources and binaries", \
     bndtools/workspace-templates/osgi; \
         name=osgi-felix; \
         description="OSGi R8 with Felix distribution", \
@@ -13,13 +7,5 @@
         description="OSGi R8 with Eclipse Platform distribution", \
     bndtools/workspace-templates/eclipse-4.35-simurel; \
         name=osgi_eclipse_4.35_2025-03_simurel; \
-        description="OSGi R8 with Eclipse SimuRel distribution", \
-    mnlipp/de.mnl.osgi/de.mnl.osgi.bnd.repository/workspace-template; \
-        name=IndexedMavenRepository; \
-        description="Provide an OSGi repository derived from a subset of one or more maven repositories", \
-    eclipse-tycho/tycho/setup/bnd-templates/pomless; \
-        name=maven-tycho-build; \
-        description="Setup a maven pomless build for bnd workspace (IDE / bndtools first).",\
-    eclipse-tycho/tycho/setup/bnd-templates/pomless-configurator/; \
-        name=maven-tycho-build2; \
-        description="Setup a maven pomless build for bnd workspace (IDE / bndtools first) including customization using a configurator pom."
+        description="OSGi R8 with Eclipse SimuRel distribution"
+
