@@ -1,0 +1,14 @@
+# Java Module System
+Automatic-Module-Name:  ${def;bsn}
+Bundle-Vendor:          Bndtools https://bndtools.org/
+Bundle-Copyright:       Copyright (c) aQute SARL (2000, ${tstamp;yyyy}) and others. All Rights Reserved.
+SPDX-License-Identifier: (EPL-2.0)
+Bundle-License:         "${SPDX-License-Identifier}";\
+                        description="This program and the accompanying materials are made available under the terms of the Eclipse Public License 2.0.";\
+                        link="https://opensource.org/licenses/EPL-2.0"
+
+#
+# Custom Settings
+#
+Git-Descriptor:         ${system-allow-fail;git describe --dirty --always --abbrev=9}
+Git-SHA:                ${system-allow-fail;git rev-list -1 --no-abbrev-commit HEAD}

@@ -1,0 +1,20 @@
+-plugin.10.build: \
+    aQute.bnd.repository.maven.provider.MavenBndRepository; \
+        snapshotUrl="https://oss.sonatype.org/content/repositories/snapshots/"; \
+        releaseUrl=https://repo.maven.apache.org/maven2/; \
+        index=${.}/build.mvn; \
+        readOnly=true; \
+        name="OSGI R8 - Build"
+
+# Eclipse Platform Release repository
+eclipse.platform.version = 4.35
+eclipse.platform.reltag  = R-4.35-202502280140
+
+eclipse.platform.baseurl = http://download.eclipse.org/eclipse/updates
+eclipse.platform.name    = "Eclipse Platform ${eclipse.platform.version}"
+eclipse.platform.url     = "${eclipse.platform.baseurl}/${eclipse.platform.version}/${eclipse.platform.reltag}"
+
+-plugin.20.eclipse.platform: \
+    aQute.bnd.repository.p2.provider.P2Repository; \
+       name  = ${eclipse.platform.name}; \
+       url   = ${eclipse.platform.url}

@@ -1,5 +1,5 @@
 -workspace-templates \
-    peterkir/bnd-workspace-template//osgi; \
+    peterkir/bnd-workspace-template/osgi; \
         name=osgi-felix; \
         description="OSGi R8 with Felix distribution", \
     peterkir/bnd-workspace-template/eclipse-4.35-platform; \
