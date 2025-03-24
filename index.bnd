@@ -1,7 +1,7 @@
 -workspace-templates \
-    peterkir/bnd-workspace-template/eclipse-4.35-platform; \
-        name="OSGi R8 & Eclipse Platform 4.35"; \
-        description="OSGi R8 with Eclipse Platform 4.35/R-4.35-202502280140 distribution", \
-    peterkir/bnd-workspace-template/eclipse-4.35-simurel-2025.03; \
-        name="OSGi R8 & Eclipse SimuRel 2025-03"; \
-        description="OSGi R8 with Eclipse Simultaneous Release 2025-03/202503121000 distribution"
+    peterkir/bnd-workspace-template/eclipse_4.35_2025-03_platform; \
+        name="OSGi R8 & Eclipse 4.35 / 2025-03 Platform"; \
+        description="OSGi R8 with Eclipse Platform 4.35/R-4.35-202502280140", \
+    peterkir/bnd-workspace-template/eclipse_4.35_2025-03_simurel; \
+        name="OSGi R8 & Eclipse 4.35 / 2025-03 SimuRel"; \
+        description="OSGi R8 with Eclipse Simultaneous Release 2025-03/202503121000"
