@@ -1,6 +1,8 @@
 # workspace-templates
 Contains bnd workspace template fragments for ecilpse bndtools
 
+TL;DR; template URI: `https://raw.githubusercontent.com/peterkir/bnd-workspace-template/refs/heads/main/index.bnd`
+
 ## usage
 
 1. Open the Bnd Workspace Fragments dialog
