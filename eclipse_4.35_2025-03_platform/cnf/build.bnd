@@ -1,7 +1,7 @@
 # Java Module System
 Automatic-Module-Name:  ${def;bsn}
-Bundle-Vendor:          Bndtools https://bndtools.org/
-Bundle-Copyright:       Copyright (c) aQute SARL (2000, ${tstamp;yyyy}) and others. All Rights Reserved.
+Bundle-Vendor:          vendor-goes-here
+Bundle-Copyright:       Copyright (c) vendor-goes-here (2025, ${tstamp;yyyy}) and others. All Rights Reserved.
 SPDX-License-Identifier: (EPL-2.0)
 Bundle-License:         "${SPDX-License-Identifier}";\
                         description="This program and the accompanying materials are made available under the terms of the Eclipse Public License 2.0.";\
