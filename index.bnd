@@ -5,11 +5,11 @@
 	peterkir/bnd-workspace-template/osgi.r8.rt.felix; \
         name=osgi.r8.rt.felix; \
         description="OSGi R8 with Felix runtime distribution"; \
-        require="peterkir/bnd-workspace-template/osgi.r8", \
+        require="peterkir/bnd-workspace-template#osgi.r8", \
     peterkir/bnd-workspace-template/eclipse_4.35_2025-03_platform; \
         name="Eclipse 4.35 / 2025-03 Platform"; \
         description="Eclipse 4.35 / 2025-03 Platform R-4.35-202502280140"; \
-        require="peterkir/bnd-workspace-template/osgi.r8", \
+        require="peterkir/bnd-workspace-template/osgi.r8#osgi.r8", \
     peterkir/bnd-workspace-template/eclipse_4.35_2025-03_simurel; \
         name="Eclipse 4.35 / 2025-03 SimuRel"; \
         description="Eclipse 4.35 / 2025-03 Simultaneous Release 202503121000"; \
