@@ -2,10 +2,10 @@
     peterkir/bnd-workspace-template/java21; \
         name="Java 21 settings"; \
         description="configure bnd for java 21", \
-	peterkir/bnd-workspace-template/osgi.r8; \
+    peterkir/bnd-workspace-template/osgi.r8; \
         name=osgi.r8; \
         description="OSGi R8 ", \
-	peterkir/bnd-workspace-template/osgi.r8.rt.felix; \
+    peterkir/bnd-workspace-template/osgi.r8.rt.felix; \
         name=osgi.r8.rt.felix; \
         description="OSGi R8 with Felix runtime distribution"; \
         require="peterkir/bnd-workspace-template#osgi.r8", \
