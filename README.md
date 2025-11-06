@@ -1,7 +1,7 @@
 # workspace-templates
 Contains bnd workspace template fragments for ecilpse bndtools
 
-## TL;DR; 
+## TL;DR
 
 template URI: `https://raw.githubusercontent.com/peterkir/bnd-workspace-template/refs/heads/main/index.bnd`
 
@@ -22,3 +22,9 @@ Select from the Eclipse Menu `File -> New -> Bnd Workspace (Fragments)`
 ![custom index uri](doc/03_Adding_custom_index_uri.png)
 
 enter following URI `https://raw.githubusercontent.com/peterkir/bnd-workspace-template/refs/heads/main/index.bnd`
+
+3. select from the added fragment options
+
+![alt text](doc/04_custom_fragment_options.png)
+
+4. confirm the 
