@@ -6,15 +6,16 @@ eclipse.platform.baseurl = http://download.eclipse.org/eclipse/updates
 eclipse.platform.name    = Eclipse Platform ${eclipse.platform.version}
 eclipse.platform.url     = '${eclipse.platform.baseurl}/${eclipse.platform.version}/${eclipse.platform.reltag}'
 
-# This was used to create the index.xml.gz file inside `/cnf/cache/p2-Eclipse Platform 4.35/index.xml.gz`
-#   which has been renamed and moved to `cnf/ext/eclipse_4.35_platform_index.xml.gz`
+# This was used to create the index.xml.gz file inside `/cnf/cache/p2-${eclipse.platform.name}/index.xml.gz`
+#   which has been renamed and moved to `cnf/ext/eclipse_${eclipse.platform.version}_platform_index.xml.gz`
+#
 #-plugin.20.eclipse.platform_${eclipse.platform.reltag}: \
 #    aQute.bnd.repository.p2.provider.P2Repository; \
 #       name  = ${eclipse.platform.name}; \
 #       url   = ${eclipse.platform.url}
 
 -plugin.21.eclipse.platform_${eclipse.platform.reltag}: \
-	aQute.bnd.repository.osgi.OSGiRepository; \
-		name      = '${eclipse.platform.name}'; \
-		locations = '${fileuri;${.}/eclipse_4.35_platform_index.xml.gz}'; \
-		cache     = '${build}/cache/ecl_${eclipse.platform.reltag}'
+    aQute.bnd.repository.osgi.OSGiRepository; \
+        name      = '${eclipse.platform.name}'; \
+        locations = '${fileuri;${.}/eclipse_4.35_platform_index.xml.gz}'; \
+        cache     = '${build}/cache/ecl_${eclipse.platform.reltag}'
