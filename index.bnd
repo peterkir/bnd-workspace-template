@@ -13,7 +13,7 @@
         name="Eclipse Platform 4.35"; \
         description="Eclipse Platform R-4.35-202502280140"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
-    peterkir/bnd-workspace-template/eclipse_4.35_2025-03_simurel; \
+    peterkir/bnd-workspace-template/eclipse_4.35_2025-03_simrel; \
         name="Eclipse SimRel 4.35/2025-03"; \
         description="Eclipse Simultaneous Release 4.35/202503121000"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \

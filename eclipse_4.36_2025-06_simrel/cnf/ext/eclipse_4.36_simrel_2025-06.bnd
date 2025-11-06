@@ -1,0 +1,24 @@
+# Eclipse Simultaneous Release repository 
+eclipse.platform.version = 4.36
+eclipse.simrel.version   = 2025-06
+eclipse.simrel.reltag    = 202506111000
+
+eclipse.simrel.baseurl = http://download.eclipse.org/releases
+eclipse.simrel.name    = Eclipse SimRel ${eclipse.platform.version}/${eclipse.simrel.version}
+eclipse.simrel.url     = '${eclipse.simrel.baseurl}/${eclipse.simrel.version}/${eclipse.simrel.reltag}'
+
+# This was used to create the repository index file inside 
+#     `/cnf/cache/p2-${eclipse.simrel.name}/index.xml.gz`
+# which has been renamed and moved to 
+#     `cnf/ext/eclipse_${eclipse.platform.version}_simrel_${eclipse.simrel.version}_index.xml.gz`
+#
+#-plugin.p2.eclipse.simrel_${eclipse.simrel.reltag}: \
+#    aQute.bnd.repository.p2.provider.P2Repository; \
+#       name  = ${eclipse.simrel.name}; \
+#       url   = ${eclipse.simrel.url}
+
+-plugin.osgi.eclipse.simrel_${eclipse.simrel.reltag}: \
+    aQute.bnd.repository.osgi.OSGiRepository; \
+        name      = '${eclipse.simrel.name}'; \
+        locations = '${fileuri;${.}/eclipse_${eclipse.platform.version}_simrel_${eclipse.simrel.version}_index.xml.gz}'; \
+        cache     = '${build}/cache/ecl_${eclipse.simrel.reltag}'
