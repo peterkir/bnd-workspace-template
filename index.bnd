@@ -13,4 +13,7 @@
     peterkir/bnd-workspace-template/eclipse_4.35_2025-03_simurel; \
         name="Eclipse 4.35 / 2025-03 SimuRel"; \
         description="Eclipse 4.35 / 2025-03 Simultaneous Release 202503121000"; \
-        require="peterkir/bnd-workspace-template/osgi.r8"
+        require="peterkir/bnd-workspace-template/osgi.r8", \
+    peterkir/bnd-workspace-template/java21; \
+        name="Java 21 settings"; \
+        description="configure bnd for java 21"

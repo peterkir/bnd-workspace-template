@@ -3,8 +3,8 @@ eclipse.platform.version = 4.35
 eclipse.platform.reltag  = R-4.35-202502280140
 
 eclipse.platform.baseurl = http://download.eclipse.org/eclipse/updates
-eclipse.platform.name    = "Eclipse Platform ${eclipse.platform.version}"
-eclipse.platform.url     = "${eclipse.platform.baseurl}/${eclipse.platform.version}/${eclipse.platform.reltag}"
+eclipse.platform.name    = 'Eclipse Platform ${eclipse.platform.version}'
+eclipse.platform.url     = '${eclipse.platform.baseurl}/${eclipse.platform.version}/${eclipse.platform.reltag}'
 
 # This was used to create the index.xml.gz file inside `/cnf/cache/p2-Eclipse Platform 4.35/index.xml.gz`
 #   which has been renamed and moved to `cnf/ext/eclipse_4.35_platform_index.xml.gz`
@@ -14,6 +14,6 @@ eclipse.platform.url     = "${eclipse.platform.baseurl}/${eclipse.platform.versi
 #       url   = ${eclipse.platform.url}
 
 -plugin: aQute.bnd.repository.osgi.OSGiRepository; \
-		name                ='${eclipse.platform.name}'; \
-		locations           ='${fileuri;${.}/ext/eclipse_4.35_platform_index.xml.gz}'; \
-		cache               ='${build}/cache/ecl_${eclipse.platform.reltag}'
+		name      = '${eclipse.platform.name}'; \
+		locations = '${fileuri;${.}/eclipse_4.35_platform_index.xml.gz}'; \
+		cache     = '${build}/cache/ecl_${eclipse.platform.reltag}'
