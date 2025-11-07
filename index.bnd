@@ -1,4 +1,7 @@
 -workspace-templates \
+    peterkir/bnd-workspace-template/java17; \
+        name="Java 17 settings"; \
+        description="configure bnd for java 17", \
     peterkir/bnd-workspace-template/java21; \
         name="Java 21 settings"; \
         description="configure bnd for java 21", \
@@ -9,15 +12,27 @@
         name=osgi.r8.rt.felix; \
         description="OSGi R8 with Felix runtime distribution"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
-    peterkir/bnd-workspace-template/eclipse_4.35_2025-03_platform; \
+    peterkir/bnd-workspace-template/eclipse_4.35_platform; \
         name="Eclipse Platform 4.35"; \
         description="Eclipse Platform R-4.35-202502280140"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
-    peterkir/bnd-workspace-template/eclipse_4.35_2025-03_simrel; \
+    peterkir/bnd-workspace-template/eclipse_4.35_simrel_2025-03; \
         name="Eclipse SimRel 4.35/2025-03"; \
         description="Eclipse Simultaneous Release 4.35/202503121000"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
-    peterkir/bnd-workspace-template/eclipse_4.36_2025-06_platform; \
+    peterkir/bnd-workspace-template/eclipse_4.36_platform; \
         name="Eclipse Platform 4.36"; \
         description="Eclipse Platform R-4.36-202505281830"; \
+        require="peterkir/bnd-workspace-template/osgi.r8", \
+    peterkir/bnd-workspace-template/eclipse_4.36_simrel_2025-06; \
+        name="Eclipse SimRel 4.36/2025-06"; \
+        description="Eclipse Simultaneous Release 4.36/202506111000"; \
+        require="peterkir/bnd-workspace-template/osgi.r8", \
+    peterkir/bnd-workspace-template/eclipse_4.36_platform; \
+        name="Eclipse Platform 4.37"; \
+        description="Eclipse Platform R-4.37-202509050730"; \
+        require="peterkir/bnd-workspace-template/osgi.r8", \
+    peterkir/bnd-workspace-template/eclipse_4.37_simrel_2025-09; \
+        name="Eclipse SimRel 4.37/2025-09"; \
+        description="Eclipse Simultaneous Release 4.37/202509101001"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
