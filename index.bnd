@@ -19,7 +19,7 @@
         description="Eclipse Simultaneous Release 4.36/202506111000"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
 \
-    peterkir/bnd-workspace-template/eclipse_4.36_platform; \
+    peterkir/bnd-workspace-template/eclipse_4.37_platform; \
         name="Eclipse Platform 4.37"; \
         description="Eclipse Platform R-4.37-202509050730"; \
         require="peterkir/bnd-workspace-template/osgi.r8", \
