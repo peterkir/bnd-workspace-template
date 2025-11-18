@@ -1,4 +1,14 @@
 -workspace-templates \
+    peterkir/bnd-workspace-template/eclipse_4.34_platform; \
+        name="Eclipse Platform 4.34"; \
+        description="Eclipse Platform R-4.34-202411201800"; \
+        require="peterkir/bnd-workspace-template/osgi.r8", \
+\
+    peterkir/bnd-workspace-template/eclipse_4.34_simrel_2024-12; \
+        name="Eclipse SimRel 4.34/2024-12"; \
+        description="Eclipse Simultaneous Release 4.34/202412041000"; \
+        require="peterkir/bnd-workspace-template/osgi.r8", \
+\
     peterkir/bnd-workspace-template/eclipse_4.35_platform; \
         name="Eclipse Platform 4.35"; \
         description="Eclipse Platform R-4.35-202502280140"; \
