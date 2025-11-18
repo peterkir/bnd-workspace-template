@@ -1,7 +1,7 @@
 # Eclipse Platform Release repository
 eclipse.platform.baseurl = http://download.eclipse.org/eclipse/updates
 
-eclipse.platform.version.4.3 = 4.34
+eclipse.platform.version.4.34 = 4.34
 eclipse.platform.reltag.R-4.34-202411201800 = R-4.34-202411201800
 
 # This was used to create the index.xml.gz file inside 
