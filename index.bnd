@@ -25,11 +25,11 @@
 \
     peterkir/bnd-workspace-template/eclipse_4.33_platform; \
         name="Eclipse Platform 4.33"; \
-        description="Eclipse Platform R-4.34-202411201800", \
+        description="Eclipse Platform R-4.33-202409030240", \
 \
     peterkir/bnd-workspace-template/eclipse_4.33_simrel_2024-09; \
-        name="Eclipse SimRel 4.34/2024-12"; \
-        description="Eclipse Simultaneous Release 4.34/202412041000", \
+        name="Eclipse SimRel 4.33/2024-09"; \
+        description="Eclipse Simultaneous Release 4.33/202409111000", \
 \
     peterkir/bnd-workspace-template/eclipse_4.34_platform; \
         name="Eclipse Platform 4.34"; \
