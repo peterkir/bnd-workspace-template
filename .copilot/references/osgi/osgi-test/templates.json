@@ -1,0 +1,59 @@
+{
+  "templates": [
+    {
+      "id": "osgi-junit5-test-class",
+      "name": "JUnit5 in-framework test class with injection",
+      "patternId": "annotation-driven-injection",
+      "description": "Test class running inside OSGi framework with injected BundleContext and service. @ExtendWith lines optional (annotations self-register) but shown for clarity.",
+      "template": "package ${test-package};\n\nimport static org.assertj.core.api.Assertions.assertThat;\n\nimport org.junit.jupiter.api.Test;\nimport org.junit.jupiter.api.extension.ExtendWith;\nimport org.osgi.framework.BundleContext;\nimport org.osgi.test.common.annotation.InjectBundleContext;\nimport org.osgi.test.common.annotation.InjectService;\nimport org.osgi.test.common.service.ServiceAware;\nimport org.osgi.test.junit5.context.BundleContextExtension;\nimport org.osgi.test.junit5.service.ServiceExtension;\n\n@ExtendWith(BundleContextExtension.class)\n@ExtendWith(ServiceExtension.class)\nclass ${test-class-name} {\n\n\t@InjectBundleContext\n\tBundleContext bundleContext;\n\n\t@InjectService\n\t${service-type} service;\n\n\t@Test\n\tvoid ${test-method-name}() {\n\t\tassertThat(service).isNotNull();\n\t\t// exercise ${service-type} contract here\n\t}\n\n\t@Test\n\tvoid dynamicArrival(@InjectService(cardinality = 0) ServiceAware<${service-type}> aware) {\n\t\tassertThat(aware.getServices()).hasSize(${expected-count});\n\t}\n}\n",
+      "params": [
+        { "name": "test-package", "type": "java package", "example": "com.acme.player.test", "description": "Package of the test class" },
+        { "name": "test-class-name", "type": "java identifier", "example": "PlayerTest", "description": "Test class name" },
+        { "name": "service-type", "type": "java type", "example": "Player", "description": "Service interface under test" },
+        { "name": "test-method-name", "type": "java identifier", "example": "playerKicksBall", "description": "Behavior-named test method" },
+        { "name": "expected-count", "type": "int", "example": "1", "description": "Expected registered service count" }
+      ]
+    },
+    {
+      "id": "osgi-integration-test-bndrun",
+      "name": "Integration-test bndrun (maven bnd-testing flavor)",
+      "patternId": "in-framework-testing",
+      "description": "Launch descriptor for running the -tests bundle inside Equinox with the JUnit platform tester. -runbundles left to the resolver.",
+      "template": "-tester: biz.aQute.tester.junit-platform\n\n-runvm: -enableassertions:${assert-package-prefix}...\n\n-runfw: org.eclipse.osgi\n-resolve.effective: active\n-runproperties: \\\n\tosgi.console=\n\n-runrequires: \\\n\tbnd.identity;id='${tests-bundle-id}'\n\n-runstartlevel: \\\n\torder=sortbynameversion,\\\n\tbegin=-1\n# -runbundles computed by resolver: bnd resolve resolve -W -b <this file>\n",
+      "params": [
+        { "name": "assert-package-prefix", "type": "package prefix", "example": "com.acme", "description": "Package tree to enable JVM assertions for" },
+        { "name": "tests-bundle-id", "type": "BSN", "example": "com.acme.player-tests", "description": "Identity of the tests bundle (artifactId-tests under maven)" }
+      ]
+    },
+    {
+      "id": "osgi-test-project-bnd",
+      "name": "bnd workspace test project bnd.bnd",
+      "patternId": "in-framework-testing",
+      "description": "Separate test project in a bnd workspace: Test-Cases discovery via @Testable hierarchy scan, buildpath with BSNs and workspace macros.",
+      "template": "Bundle-Description: ${description}\n\nTest-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}\n\n-dependson: \\\n\t${impl-project-bsn}\n\n-buildpath: \\\n\tosgi.core;version=${osgi-core-version};maven-scope=provided,\\\n\t${api-project-bsn};version=snapshot,\\\n\t${junit},\\\n\t${osgitest}\n",
+      "params": [
+        { "name": "description", "type": "string", "example": "Player integration tests", "description": "Bundle-Description text" },
+        { "name": "impl-project-bsn", "type": "BSN", "example": "com.acme.player.impl", "description": "Implementation project this test depends on (build order only)" },
+        { "name": "api-project-bsn", "type": "BSN", "example": "com.acme.player.api", "description": "API bundle on the buildpath — never the impl" },
+        { "name": "osgi-core-version", "type": "version", "example": "8.0.0", "description": "osgi.core API version, provided scope" }
+      ],
+      "note": "${classes...}, ${junit}, ${osgitest} are bnd/workspace macros, NOT template parameters — copy literally. Only names listed in params are placeholders."
+    },
+    {
+      "id": "osgi-assertj-custom-assert",
+      "name": "Custom AssertJ assertion pair for an OSGi type",
+      "patternId": "assertj-per-domain-module",
+      "description": "Abstract+concrete AssertJ pair following the osgi-test assertion module convention.",
+      "template": "public abstract class Abstract${type-simple-name}Assert<SELF extends Abstract${type-simple-name}Assert<SELF, ACTUAL>, ACTUAL extends ${type-fqn}>\n\textends AbstractAssert<SELF, ACTUAL> {\n\n\tprotected Abstract${type-simple-name}Assert(ACTUAL actual, Class<SELF> selfType) {\n\t\tsuper(actual, selfType);\n\t}\n\n\tpublic SELF ${assertion-method}(${assertion-arg-type} expected) {\n\t\tisNotNull();\n\t\tif (!actual.${actual-getter}().equals(expected)) {\n\t\t\tthrow failureWithActualExpected(actual.${actual-getter}(), expected,\n\t\t\t\t\"%nExpecting %s to have ${assertion-property} %s but was %s\", actual, expected, actual.${actual-getter}());\n\t\t}\n\t\treturn myself;\n\t}\n}\n\npublic class ${type-simple-name}Assert extends Abstract${type-simple-name}Assert<${type-simple-name}Assert, ${type-fqn}> {\n\n\tpublic static final InstanceOfAssertFactory<${type-fqn}, ${type-simple-name}Assert> ${factory-constant} = new InstanceOfAssertFactory<>(\n\t\t${type-fqn}.class, ${type-simple-name}Assert::assertThat);\n\n\tpublic ${type-simple-name}Assert(${type-fqn} actual) {\n\t\tsuper(actual, ${type-simple-name}Assert.class);\n\t}\n\n\tpublic static ${type-simple-name}Assert assertThat(${type-fqn} actual) {\n\t\treturn new ${type-simple-name}Assert(actual);\n\t}\n}\n",
+      "params": [
+        { "name": "type-simple-name", "type": "java identifier", "example": "Bundle", "description": "Simple name of asserted OSGi type" },
+        { "name": "type-fqn", "type": "java type", "example": "Bundle (imported org.osgi.framework.Bundle)", "description": "Asserted type reference" },
+        { "name": "factory-constant", "type": "java constant", "example": "BUNDLE", "description": "InstanceOfAssertFactory constant name" },
+        { "name": "assertion-method", "type": "java identifier", "example": "hasSymbolicName", "description": "Fluent assertion method name" },
+        { "name": "assertion-arg-type", "type": "java type", "example": "String", "description": "Expected-value parameter type" },
+        { "name": "actual-getter", "type": "java identifier", "example": "getSymbolicName", "description": "Getter on actual used for comparison" },
+        { "name": "assertion-property", "type": "string", "example": "symbolic name", "description": "Human-readable property name in failure message" }
+      ]
+    }
+  ]
+}

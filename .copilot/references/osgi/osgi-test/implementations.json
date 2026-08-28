@@ -1,0 +1,94 @@
+{
+  "implementations": [
+    {
+      "patternId": "annotation-driven-injection",
+      "primary": true,
+      "path": "org.osgi.test.junit5/src/main/java/org/osgi/test/common/annotation/InjectBundleContext.java",
+      "lines": [61, 68],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.junit5/src/main/java/org/osgi/test/common/annotation/InjectBundleContext.java#L61-L68",
+      "rationale": "Smallest complete instance of the pattern: marker annotation whose @ExtendWith meta-annotation self-registers the resolving extension.",
+      "excerpt": "@Inherited\n@Target({\n\tFIELD, PARAMETER\n})\n@Retention(RUNTIME)\n@ExtendWith(BundleContextExtension.class)\n@Documented\npublic @interface InjectBundleContext {}"
+    },
+    {
+      "patternId": "annotation-driven-injection",
+      "primary": false,
+      "path": "org.osgi.test.junit5/src/main/java/org/osgi/test/common/annotation/InjectService.java",
+      "lines": [56, 90],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.junit5/src/main/java/org/osgi/test/common/annotation/InjectService.java#L56-L90",
+      "rationale": "Configurable variant: annotation members carry filter, cardinality, timeout with defaults.",
+      "excerpt": "@Inherited\n@Target({\n\tFIELD, PARAMETER\n})\n@Retention(RUNTIME)\n@ExtendWith(ServiceExtension.class)\n@Documented\npublic @interface InjectService {\n\n\tstatic long DEFAULT_TIMEOUT = 200l;\n\n\tString filter() default \"\";\n\n\tString[] filterArguments() default {};\n\n\tint cardinality() default 1;\n\n\tlong timeout() default DEFAULT_TIMEOUT;\n}"
+    },
+    {
+      "patternId": "generic-injecting-extension",
+      "primary": true,
+      "path": "org.osgi.test.junit5/src/main/java/org/osgi/test/junit5/inject/InjectingExtension.java",
+      "lines": [50, 93],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.junit5/src/main/java/org/osgi/test/junit5/inject/InjectingExtension.java#L50-L93",
+      "rationale": "The reusable core: implements all five JUnit5 lifecycle interfaces once; subclasses only provide annotation type, target types, resolveValue().",
+      "excerpt": "public abstract class InjectingExtension<INJECTION extends Annotation>\n\timplements BeforeEachCallback, BeforeAllCallback, ParameterResolver, AfterAllCallback, AfterEachCallback {\n\n\tprivate final Class<INJECTION>\tannotation;\n\tprivate final List<Class<?>>\ttargetTypes;\n\n\tprotected InjectingExtension(Class<INJECTION> annotation, Class<?>... targetTypes) {\n\t\tthis.annotation = requireNonNull(annotation);\n\t\tthis.targetTypes = Arrays.asList(targetTypes);\n\t}\n\n\t@Override\n\tpublic void beforeAll(ExtensionContext extensionContext) throws Exception {\n\t\tList<Field> fields = findAnnotatedFields(extensionContext.getRequiredTestClass(), annotation(),\n\t\t\tm -> Modifier.isStatic(m.getModifiers()));\n\n\t\tfields.stream()\n\t\t\t.filter(field -> supportsField(field, extensionContext))\n\t\t\t.forEach(field -> setField(field, null, resolveField(field, extensionContext)));\n\t\tif (isLifecyclePerClass(extensionContext)) {\n\t\t\tinjectNonStaticFields(extensionContext, extensionContext.getRequiredTestInstance());\n\t\t}\n\t}\n\n\t@Override\n\tpublic void beforeEach(ExtensionContext extensionContext) throws Exception {\n\t\tif (!isLifecyclePerClass(extensionContext)) {\n\t\t\tinjectNonStaticFields(extensionContext, extensionContext.getRequiredTestInstance());\n\t\t}\n\t}"
+    },
+    {
+      "patternId": "generic-injecting-extension",
+      "primary": false,
+      "path": "org.osgi.test.junit5/src/main/java/org/osgi/test/junit5/context/BundleContextExtension.java",
+      "lines": [60, 72],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.junit5/src/main/java/org/osgi/test/junit5/context/BundleContextExtension.java#L60-L72",
+      "rationale": "Minimal concrete subclass: constructor wires annotation + target type; resolveValue delegates to store accessor.",
+      "excerpt": "public class BundleContextExtension extends InjectingExtension<InjectBundleContext> {\n\n\tpublic static final String BUNDLE_CONTEXT_KEY = \"bundle.context\";\n\n\tpublic BundleContextExtension() {\n\t\tsuper(InjectBundleContext.class, BundleContext.class);\n\t}\n\n\t@Override\n\tprotected Object resolveValue(TargetType targetType, InjectBundleContext injection,\n\t\tExtensionContext extensionContext) throws ParameterResolutionException {\n\t\treturn getBundleContext(extensionContext);\n\t}\n}"
+    },
+    {
+      "patternId": "store-scoped-cleanup",
+      "primary": true,
+      "path": "org.osgi.test.junit5/src/main/java/org/osgi/test/junit5/context/BundleContextExtension.java",
+      "lines": [74, 126],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.junit5/src/main/java/org/osgi/test/junit5/context/BundleContextExtension.java#L74-L126",
+      "rationale": "Full lifecycle: lazy store creation keyed to unique test id, CloseableResource wrapper, parent-context walk for nested classes, proxy-based cleanup.",
+      "excerpt": "public static BundleContext getBundleContext(ExtensionContext extensionContext) {\n\tBundleContext bundleContext = getStore(extensionContext)\n\t\t.getOrComputeIfAbsent(BUNDLE_CONTEXT_KEY,\n\t\t\tkey -> new CloseableResourceBundleContext(getParentBundleContext(extensionContext)),\n\t\t\tCloseableResourceBundleContext.class)\n\t\t.get();\n\treturn bundleContext;\n}\n\nprivate static BundleContext getParentBundleContext(ExtensionContext extensionContext) {\n\tBundleContext parentContext = extensionContext.getParent()\n\t\t.filter(context -> context.getTestClass()\n\t\t\t.isPresent())\n\t\t.map(BundleContextExtension::getBundleContext)\n\t\t.orElseGet(() -> ContextHelper.getBundleContext(extensionContext.getRequiredTestClass()));\n\treturn parentContext;\n}\n\npublic static class CloseableResourceBundleContext implements CloseableResource {\n\n\tprivate final BundleContext bundleContext;\n\n\tCloseableResourceBundleContext(BundleContext bundleContext) {\n\t\tthis.bundleContext = CloseableBundleContext.proxy(bundleContext);\n\t}\n\n\t@Override\n\tpublic void close() throws Exception {\n\t\t((AutoCloseable) get()).close();\n\t}\n}\n\nstatic Store getStore(ExtensionContext extensionContext) {\n\treturn extensionContext\n\t\t.getStore(Namespace.create(BundleContextExtension.class, extensionContext.getUniqueId()));\n}"
+    },
+    {
+      "patternId": "in-framework-testing",
+      "primary": true,
+      "path": "org.osgi.test.junit5/test.bndrun",
+      "lines": [17, 45],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.junit5/test.bndrun#L17-L45",
+      "rationale": "Complete integration-test launch descriptor: junit-platform tester, Equinox framework, single identity requirement, resolver-computed runbundles.",
+      "excerpt": "-tester: biz.aQute.tester.junit-platform\n\n-runvm: -enableassertions:org.osgi.test...,\\\n\t${def;argLine}\n\n-runfw: org.eclipse.osgi\n-resolve.effective: active\n-runproperties: \\\n\tlogback.configurationFile='${fileuri;${.}/logback.xml}',\\\n\torg.osgi.framework.bootdelegation='sun.misc,sun.reflect',\\\n\tosgi.console=\n\n-runpath: \\\n\tch.qos.logback.classic,\\\n\tch.qos.logback.core,\\\n\torg.apache.felix.logback,\\\n\tslf4j.api\n-runrequires: \\\n\tbnd.identity;id='${project.artifactId}-tests'\n# This will help us keep -runbundles sorted\n-runstartlevel: \\\n    order=sortbynameversion,\\\n    begin=-1\n# -runbundles is calculated by the bnd-resolver-maven-plugin"
+    },
+    {
+      "patternId": "in-framework-testing",
+      "primary": false,
+      "path": "examples/osgi-test-example-bndworkspace/org.osgi.test.example.player.test/bnd.bnd",
+      "lines": [1, 17],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/examples/osgi-test-example-bndworkspace/org.osgi.test.example.player.test/bnd.bnd#L1-L17",
+      "rationale": "bnd-workspace variant: Test-Cases discovery macro via JUnit platform @Testable hierarchy scan.",
+      "excerpt": "-include: ${workspace}/cnf/includes/jdt.bnd\n\nBundle-Description: OSGi Testing Example Player Test\n\nTest-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}\n\n-dependson: \\\n\torg.osgi.test.example.player.impl\n\n-buildpath: \\\n\tosgi.core;version=8.0.0;maven-scope=provided,\\\n\torg.osgi.namespace.service;version=1.0.0;maven-scope=provided,\\\n\torg.osgi.test.example.api;version=snapshot,\\\n\t${junit},\\\n\t${mockito},\\\n\t${osgitest}"
+    },
+    {
+      "patternId": "assertj-per-domain-module",
+      "primary": true,
+      "path": "org.osgi.test.assertj.framework/src/main/java/org/osgi/test/assertj/bundle/BundleAssert.java",
+      "lines": [19, 36],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/org.osgi.test.assertj.framework/src/main/java/org/osgi/test/assertj/bundle/BundleAssert.java#L19-L36",
+      "rationale": "Canonical AssertJ leaf class: extends Abstract variant, static assertThat factory, InstanceOfAssertFactory constant for asInstanceOf chaining.",
+      "excerpt": "public class BundleAssert extends AbstractBundleAssert<BundleAssert, Bundle> {\n\n\tpublic static final InstanceOfAssertFactory<Bundle, BundleAssert> BUNDLE = new InstanceOfAssertFactory<>(\n\t\tBundle.class, BundleAssert::assertThat);\n\n\tpublic BundleAssert(Bundle actual) {\n\t\tsuper(actual, BundleAssert.class);\n\t}\n\n\tpublic static BundleAssert assertThat(Bundle actual) {\n\t\treturn new BundleAssert(actual);\n\t}\n}"
+    },
+    {
+      "patternId": "triple-example-consumption",
+      "primary": true,
+      "path": "examples/osgi-test-example-bndworkspace/org.osgi.test.example.player.test/src/org/osgi/test/example/player/test/PlayerTest.java",
+      "lines": [46, 97],
+      "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+      "permalink": "https://github.com/eclipse-osgi-technology/osgi-test/blob/696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce/examples/osgi-test-example-bndworkspace/org.osgi.test.example.player.test/src/org/osgi/test/example/player/test/PlayerTest.java#L46-L97",
+      "rationale": "Complete consumer-side test: static + instance injection, service registration in @BeforeAll, ServiceAware for dynamic arrival, DictionaryAssert usage.",
+      "excerpt": "@ExtendWith(BundleContextExtension.class)\n@ExtendWith(ServiceExtension.class)\npublic class PlayerTest {\n\n\tstatic Ball b;\n\n\t@InjectBundleContext\n\tBundleContext bc;\n\n\t@BeforeAll\n\tstatic void beforeAll(@InjectBundleContext BundleContext staticBC) {\n\t\tb = mock(Ball.class);\n\t\tDictionary<String, Object> props = Dictionaries.dictionaryOf(\"test\", \"testball\");\n\t\tstaticBC.registerService(Ball.class, b, props);\n\t}\n\n\t@InjectService\n\tPlayer p;\n\n\t@Test\n\tvoid myTest() {\n\t\tassertThat(p).isNotNull();\n\t\tassertThat(p.getBall()).isSameAs(b);\n\t\tverifyNoInteractions(b);\n\t\tp.kickBall();\n\t\tverify(b).kick();\n\t}\n\n\t@Test\n\tvoid myServiceAwareTest(@InjectService(cardinality = 0) ServiceAware<Ball> ball) {\n\t\tassertThat(ball.getServices()).hasSize(1);\n\t\tDictionaryAssert.assertThat(ball.getServiceReference()\n\t\t\t.getProperties())\n\t\t\t.containsEntry(\"test\", \"testball\");\n\t\tbc.registerService(Ball.class, new DummyBall(), null);\n\t\tassertThat(ball.getServices()).hasSize(2);\n\t}\n}"
+    }
+  ]
+}

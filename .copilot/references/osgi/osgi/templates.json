@@ -1,0 +1,80 @@
+{
+  "templates": [
+    {
+      "id": "api-bundle-bnd",
+      "name": "Specification API project bnd.bnd",
+      "patternId": "spec-api-impl-tck-triple",
+      "description": "Minimal bnd.bnd for an OSGi specification API bundle: include layers, export all spec packages, annotation + provided framework buildpath. Note: ${p} and ${includes} are literal bnd macros, not template parameters.",
+      "template": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/${api-layer}.bnd\n\nExport-Package: ${p}.*; -split-package:=first\n\n-buildpath = \\\n    ${osgi.annotation.buildpath}, \\\n    org.osgi.framework;maven-scope=provided;version=${framework-version}",
+      "params": [
+        { "name": "api-layer", "type": "string", "example": "core", "description": "Include layer selecting API level: core, cmpn, or companion" },
+        { "name": "framework-version", "type": "version", "example": "1.8", "description": "org.osgi.framework package version the API compiles against" }
+      ]
+    },
+    {
+      "id": "impl-bundle-bnd",
+      "name": "Reference implementation project bnd.bnd",
+      "patternId": "impl-activator-servicefactory",
+      "description": "bnd.bnd for a reference implementation bundle: activator, Export-Service, fully private packages. ${p} is the literal bnd project-package macro.",
+      "template": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/cmpn.bnd\n\nBundle-Activator\t\t\t= ${p}.Activator\nBundle-Description\t\t\t= ${description}\n\nExport-Service\t\t\t\t= ${service-interface}\n\n-privatepackage \t\t\t= ${p}.*\n\n-buildpath = \\\n\t${api-project};version=latest, \\\n\torg.osgi.framework;maven-scope=provided;version=1.8",
+      "params": [
+        { "name": "description", "type": "string", "example": "OSGi Preferences Service Reference Implementation", "description": "Human-readable bundle description" },
+        { "name": "service-interface", "type": "fqcn", "example": "org.osgi.service.prefs.PreferencesService", "description": "Fully qualified spec service interface the bundle registers" },
+        { "name": "api-project", "type": "bsn", "example": "org.osgi.service.prefs", "description": "BSN of the sibling API project" }
+      ]
+    },
+    {
+      "id": "impl-activator",
+      "name": "RI BundleActivator with ServiceFactory registration",
+      "patternId": "impl-activator-servicefactory",
+      "description": "Activator registering the spec service as a ServiceFactory so each consuming bundle gets a scoped instance.",
+      "template": "package ${impl-package};\n\nimport java.util.Dictionary;\nimport java.util.Hashtable;\n\nimport org.osgi.framework.Bundle;\nimport org.osgi.framework.BundleActivator;\nimport org.osgi.framework.BundleContext;\nimport org.osgi.framework.ServiceFactory;\nimport org.osgi.framework.ServiceRegistration;\nimport ${service-interface};\n\npublic class Activator\n\t\timplements BundleActivator, ServiceFactory<${service-type}> {\n\tprivate static final String\tSERVICE_NAME = \"${service-interface}\";\n\tprivate BundleContext\t\tbundleContext = null;\n\n\t@Override\n\tpublic synchronized void start(BundleContext context) {\n\t\tthis.bundleContext = context;\n\t\tDictionary<String,Object> properties = new Hashtable<>(4);\n\t\tproperties.put(\"Description\", \"${service-description}\");\n\t\tcontext.registerService(SERVICE_NAME, this, properties);\n\t}\n\n\t@Override\n\tpublic synchronized void stop(BundleContext context) {\n\t\t// registration is unregistered automatically on bundle stop\n\t}\n\n\t@Override\n\tpublic ${service-type} getService(Bundle bundle,\n\t\t\tServiceRegistration<${service-type}> registration) {\n\t\treturn /* per-bundle scoped instance */ null;\n\t}\n\n\t@Override\n\tpublic void ungetService(Bundle bundle,\n\t\t\tServiceRegistration<${service-type}> registration,\n\t\t\t${service-type} service) {\n\t\t// release per-bundle resources\n\t}\n}",
+      "params": [
+        { "name": "impl-package", "type": "package", "example": "org.osgi.impl.service.prefs", "description": "Implementation package (== BSN)" },
+        { "name": "service-interface", "type": "fqcn", "example": "org.osgi.service.prefs.PreferencesService", "description": "Fully qualified service interface for import and registration name" },
+        { "name": "service-type", "type": "class", "example": "PreferencesService", "description": "Simple name of the service type parameter" },
+        { "name": "service-description", "type": "string", "example": "The OSGi Preferences Service", "description": "Description service property value" }
+      ]
+    },
+    {
+      "id": "api-package-info",
+      "name": "Versioned API package-info.java",
+      "patternId": "semantic-package-versioning",
+      "description": "package-info.java carrying the semantic package version and consumer/provider import range documentation.",
+      "template": "/**\n * ${spec-name} Package Version ${package-version}.\n * <p>\n * Bundles wishing to use this package must list the package in the\n * Import-Package header of the bundle's manifest. This package has two types of\n * users: the consumers that use the API in this package and the providers that\n * implement the API in this package.\n * <p>\n * Example import for consumers using the API in this package:\n * <p>\n * {@code  Import-Package: ${package-name}; version=\"[${package-version},${next-major})\"}\n * <p>\n * Example import for providers implementing the API in this package:\n * <p>\n * {@code  Import-Package: ${package-name}; version=\"[${package-version},${next-minor})\"}\n */\n@Version(\"${package-version}\")\npackage ${package-name};\n\nimport org.osgi.annotation.versioning.Version;",
+      "params": [
+        { "name": "spec-name", "type": "string", "example": "Log Service", "description": "Specification display name" },
+        { "name": "package-name", "type": "package", "example": "org.osgi.service.log", "description": "Exported package name" },
+        { "name": "package-version", "type": "version", "example": "1.5", "description": "Semantic package version (major.minor, no micro)" },
+        { "name": "next-major", "type": "version", "example": "2.0", "description": "Upper bound for consumers (next major)" },
+        { "name": "next-minor", "type": "version", "example": "1.6", "description": "Upper bound for providers (next minor)" }
+      ]
+    },
+    {
+      "id": "tck-project-bnd",
+      "name": "TCK project bnd.bnd",
+      "patternId": "tck-in-framework-junit",
+      "description": "bnd.bnd for a TCK suite: support classes conditionally packaged, embedded test bundles, signature test, RI under test in -runbundles. ${p} and ${includes} are literal bnd macros; ${-signaturetest} is a literal bnd merged-instruction reference.",
+      "template": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/osgi.tck.junit-platform.bnd, ${includes}/tck.bnd, ${includes}/cmpn.bnd\n\nBundle-Description\t\t\t\t\t: A test case for the ${spec-name} implementation.\n\n-conditionalpackage\t\t\t\t\t= org.osgi.test.support.*\n-privatepackage\t\t\t\t\t\t=  \\\n\t${p}.junit\nImport-Package: ${-signaturetest}, *\n\n-includeresource\t\t\t\t\t= \\\n\ttb1.jar\n\n-signaturetest                      = ${api-package}\n\n-buildpath = \\\n    org.osgi.test.support;version=project, \\\n    org.osgi.framework;maven-scope=provided;version=1.8, \\\n    ${api-project};version=latest\n\n-runbundles = \\\n\t${impl-project}; version=latest",
+      "params": [
+        { "name": "spec-name", "type": "string", "example": "event generic mechanism", "description": "Specification under test" },
+        { "name": "api-package", "type": "package", "example": "org.osgi.service.event", "description": "API package for signature verification" },
+        { "name": "api-project", "type": "bsn", "example": "org.osgi.service.event", "description": "API project BSN on the buildpath" },
+        { "name": "impl-project", "type": "bsn", "example": "org.osgi.impl.service.event", "description": "Reference implementation BSN launched by the TCK run" }
+      ]
+    },
+    {
+      "id": "tck-testcase",
+      "name": "TCK test class on OSGiTestCase",
+      "patternId": "tck-in-framework-junit",
+      "description": "Spec-compliance test class: extends OSGiTestCase, exercises legal/illegal input matrices against the live framework.",
+      "template": "package ${tck-package}.junit;\n\nimport org.osgi.test.support.OSGiTestCase;\n\npublic class ${test-class} extends OSGiTestCase {\n\n\tpublic void test${scenario}() throws Exception {\n\t\t// arrange: obtain service/API objects, use getContext() for BundleContext\n\t\t// act + assert: exhaustive legal/illegal input matrix per spec section ${spec-section}\n\t}\n}",
+      "params": [
+        { "name": "tck-package", "type": "package", "example": "org.osgi.test.cases.event", "description": "TCK project package (== BSN)" },
+        { "name": "test-class", "type": "class", "example": "EventTests", "description": "Test class name" },
+        { "name": "scenario", "type": "identifier", "example": "IllegalTopics", "description": "Scenario suffix for the test method" },
+        { "name": "spec-section", "type": "string", "example": "113.3.2", "description": "Specification section the test asserts" }
+      ]
+    }
+  ]
+}

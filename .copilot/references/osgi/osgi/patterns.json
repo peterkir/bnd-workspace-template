@@ -1,0 +1,106 @@
+{
+  "patterns": [
+    {
+      "id": "spec-api-impl-tck-triple",
+      "name": "Specification triple: API / reference implementation / TCK as sibling projects",
+      "description": "Each OSGi specification is realized as up to three sibling bnd projects: org.osgi.service.<spec> (API bundle), org.osgi.impl.service.<spec> (reference implementation), org.osgi.test.cases.<spec> (TCK). The TCK's -runbundles wires the RI under test; some RIs ship as prebuilt binaries in licensed/repo instead of source projects (e.g. event impl).",
+      "evidence": [
+        "org.osgi.service.prefs/",
+        "org.osgi.impl.service.prefs/bnd.bnd",
+        "org.osgi.test.cases.event/bnd.bnd",
+        "licensed/repo/"
+      ],
+      "rules": [
+        "API project exports exactly the spec packages; impl project is fully private (-privatepackage ${p}.*)",
+        "Impl bundle declares Export-Service and registers via Bundle-Activator",
+        "TCK project names impl under test in -runbundles with version=latest",
+        "Directory name == BSN for all three projects"
+      ],
+      "graphCommunities": "TCK/impl/API triads dominate the 905 Leiden communities; hub DefaultTestBundleControl (321 edges) confirms TCK support coupling"
+    },
+    {
+      "id": "central-cnf-includes-config",
+      "name": "Central cnf/build.bnd + composable cnf/includes/*.bnd layers",
+      "description": "All cross-cutting build config lives in cnf/build.bnd (global headers, version scheme, signing/packaging plugins, -runfw). Per-project bnd.bnd files start with -include: ${includes}/jdt.bnd plus a layer file (core.bnd, cmpn.bnd, tck.bnd, promise.bnd, companion.bnd) selecting the API level, keeping project files 8-30 lines.",
+      "evidence": [
+        "cnf/build.bnd",
+        "cnf/includes/jdt.bnd",
+        "cnf/includes/cmpn.bnd",
+        "org.osgi.service.log/bnd.bnd",
+        "org.osgi.test.cases.event/bnd.bnd"
+      ],
+      "rules": [
+        "Global identity headers (Bundle-Vendor, Bundle-SCM, Bundle-License, Git-SHA) stamped once in cnf/build.bnd",
+        "Per-project bnd.bnd first line: -include: ${includes}/jdt.bnd, ${includes}/<layer>.bnd",
+        "Reproducible builds: -reproducible: true, -noextraheaders: true, LICENSE+NOTICE embedded via -includeresource.legal",
+        "-diffignore: Bundle-Version so baselining ignores timestamp versions"
+      ]
+    },
+    {
+      "id": "semantic-package-versioning",
+      "name": "Package-level semantic versioning via @Version package-info.java",
+      "description": "Every exported package carries a package-info.java with @Version(\"x.y\") from org.osgi.annotation.versioning; javadoc documents distinct consumer [1.5,2.0) vs provider [1.5,1.6) import ranges. Bundle versions are build-timestamped and excluded from baselining; the package version is the semantic contract.",
+      "evidence": [
+        "org.osgi.service.log/src/org/osgi/service/log/package-info.java",
+        "cnf/build.bnd"
+      ],
+      "rules": [
+        "package-info.java: @Version(\"major.minor\") — never micro in the annotation",
+        "Javadoc states consumer and provider Import-Package range examples",
+        "Export-Package: ${p}.*; -split-package:=first in API bnd.bnd",
+        "Baselining ignores Bundle-Version (-diffignore), package versions gate compatibility"
+      ]
+    },
+    {
+      "id": "tck-in-framework-junit",
+      "name": "TCK tests execute inside the reference framework with embedded test bundles",
+      "description": "TCK projects run JUnit tests in-framework (-runfw org.osgi.impl.framework). Test classes extend org.osgi.test.support.OSGiTestCase which receives the BundleContext from the OSGi JUnit runner (FrameworkUtil fallback). Scenario bundles tb1.jar/tb2.jar are built on demand by the -make recipe from bnd/tbN.bnd and embedded as resources; -signaturetest asserts API signature fidelity.",
+      "evidence": [
+        "org.osgi.test.cases.event/bnd.bnd",
+        "org.osgi.test.cases.event/src/org/osgi/test/cases/event/junit/EventTests.java",
+        "org.osgi.test.support/src/org/osgi/test/support/OSGiTestCase.java",
+        "org.osgi.test.cases.event/bnd/tb1.bnd",
+        "cnf/build.bnd"
+      ],
+      "rules": [
+        "-conditionalpackage = org.osgi.test.support.* copies support classes into the TCK bundle",
+        "-privatepackage = ${p}.junit holds tests; Export-Package = ${p}.service holds shared test API",
+        "-includeresource = tb1.jar, tb2.jar + bnd/tbN.bnd recipes (-make (*).(jar);type=bnd;recipe=\"bnd/$1.bnd\")",
+        "-signaturetest = <api package> for signature verification",
+        "Security variant lives in a sibling *.secure project, not a flag"
+      ],
+      "graphCommunities": "DefaultTestBundleControl (321 edges) and BundleContext (1699) god nodes anchor the TCK communities"
+    },
+    {
+      "id": "impl-activator-servicefactory",
+      "name": "Reference implementation registers spec service via BundleActivator (+ServiceFactory)",
+      "description": "RI bundles declare Bundle-Activator in bnd.bnd and Export-Service metadata. The activator registers the spec service, often implementing ServiceFactory so each consuming bundle gets a scoped instance; all impl packages stay private.",
+      "evidence": [
+        "org.osgi.impl.service.prefs/bnd.bnd",
+        "org.osgi.impl.service.prefs/src/org/osgi/impl/service/prefs/Activator.java"
+      ],
+      "rules": [
+        "Bundle-Activator = ${p}.Activator (package == BSN)",
+        "Export-Service: <spec service FQN> declared in bnd.bnd",
+        "-privatepackage = ${p}.* — implementation never exports packages",
+        "-buildpath: spec API project version=latest + org.osgi.framework maven-scope=provided"
+      ]
+    },
+    {
+      "id": "bsn-gradle-bnd-workspace",
+      "name": "Single bnd-workspace Gradle build over ~190 BSN-named projects",
+      "description": "settings.gradle applies biz.aQute.bnd.workspace; gradle.properties pins bnd_version and seeds the project graph from bnd_build=osgi.build so Gradle builds exactly the bnd workspace dependency closure. No per-project build.gradle logic needed for standard bundles.",
+      "evidence": [
+        "settings.gradle",
+        "gradle.properties",
+        "gradle/wrapper/gradle-wrapper.properties"
+      ],
+      "rules": [
+        "bnd workspace plugin version pinned once (bnd_version=7.1.0)",
+        "Workspace properties injected via gradle.ext.bndWorkspaceConfigure",
+        "Aggregate projects (osgi.core, osgi.cmpn, osgi.tck) assemble deliverables from -make/-includeresource, not Gradle logic",
+        "-workingset filters partition projects into Build/Companion/Implementations/TCKs views"
+      ]
+    }
+  ]
+}

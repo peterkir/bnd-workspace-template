@@ -1,0 +1,104 @@
+{
+  "implementations": [
+    {
+      "patternId": "spec-api-impl-tck-triple",
+      "primary": true,
+      "path": "org.osgi.impl.service.prefs/bnd.bnd",
+      "lines": [1, 14],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.impl.service.prefs/bnd.bnd#L1-L14",
+      "excerpt": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/cmpn.bnd\n\nBundle-Activator\t\t\t= ${p}.Activator\nBundle-Description\t\t\t= OSGi Preferences Service Reference Implementation by Sun Microsystems.\nBundle-Vendor\t\t\t\t= Sun Microsystems, Inc.\n\nExport-Service\t\t\t\t= org.osgi.service.prefs.PreferencesService\n\n-privatepackage \t\t\t= ${p}.*\n\n-buildpath = \\\n\torg.osgi.service.prefs;version=latest, \\\n\torg.osgi.framework;maven-scope=provided;version=1.8",
+      "rationale": "Complete RI project file: 14 lines suffice — activator, Export-Service, fully private packages, buildpath = sibling API project + provided framework. The impl side of the API/RI/TCK triple."
+    },
+    {
+      "patternId": "spec-api-impl-tck-triple",
+      "primary": false,
+      "path": "org.osgi.service.log/bnd.bnd",
+      "lines": [1, 8],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.service.log/bnd.bnd#L1-L8",
+      "excerpt": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/companion.bnd, ${includes}/core.bnd\n\nExport-Package: ${p}.*; -split-package:=first\n\n-buildpath = \\\n    ${osgi.annotation.buildpath}, \\\n    org.osgi.framework;maven-scope=provided;version=1.8",
+      "rationale": "The API side of the triple: an entire specification API bundle in 8 lines — include layers, export-all-spec-packages, annotation + provided framework buildpath."
+    },
+    {
+      "patternId": "central-cnf-includes-config",
+      "primary": true,
+      "path": "cnf/build.bnd",
+      "lines": [80, 111],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/cnf/build.bnd#L80-L111",
+      "excerpt": "-groupid: org.osgi\n-pom: version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}\nBundle-Name: ${-groupid}:${bsn}\nBundle-Copyright: ${copyright}\nBundle-Vendor:    Eclipse Foundation\nBundle-Version:   ${build.version}-SNAPSHOT\nBundle-DocURL:    https://docs.osgi.org/\nGit-Descriptor:   ${system-allow-fail;git describe --dirty --always --abbrev=9}\nGit-SHA:          ${system-allow-fail;git rev-list -1 --no-abbrev-commit HEAD}\nBundle-SCM:       url=https://github.com/osgi/osgi, \\\n                  connection=scm:git:https://github.com/osgi/osgi.git, \\\n                  developerConnection=scm:git:git@github.com:osgi/osgi.git, \\\n                  tag=${Git-Descriptor}\nBundle-Developers: osgi; \\\n                  email=osgi-wg@eclipse.org; \\\n                  name=\"OSGi Working Group\"; \\\n                  organization=\"Eclipse Foundation\"; \\\n                  organizationUrl=\"https://www.osgi.org/\"\nSPDX-License-Identifier: Apache-2.0\nBundle-License: ${SPDX-License-Identifier};\\\n                description=\"This program and the accompanying materials are made available under the terms of the Apache License, Version 2.0.\";\\\n                link=\"https://opensource.org/licenses/Apache-2.0\"\n\n-reproducible: true\n-noextraheaders: true\n-removeheaders: Private-Package\n-includeresource.legal:\\\n \"META-INF/=${project.workspace}/LICENSE\",\\\n \"META-INF/=${project.workspace}/NOTICE\"\n\n# Don't baseline Bundle-Version\n-diffignore: Bundle-Version",
+      "rationale": "Central identity/reproducibility block: every bundle inherits vendor, SCM, license headers, reproducible-build flags and baseline exclusion from this single location."
+    },
+    {
+      "patternId": "semantic-package-versioning",
+      "primary": true,
+      "path": "org.osgi.service.log/src/org/osgi/service/log/package-info.java",
+      "lines": [19, 40],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.service.log/src/org/osgi/service/log/package-info.java#L19-L40",
+      "excerpt": "/**\n * Log Service Package Version 1.5.\n * <p>\n * Bundles wishing to use this package must list the package in the\n * Import-Package header of the bundle's manifest. This package has two types of\n * users: the consumers that use the API in this package and the providers that\n * implement the API in this package.\n * <p>\n * Example import for consumers using the API in this package:\n * <p>\n * {@code  Import-Package: org.osgi.service.log; version=\"[1.5,2.0)\"}\n * <p>\n * Example import for providers implementing the API in this package:\n * <p>\n * {@code  Import-Package: org.osgi.service.log; version=\"[1.5,1.6)\"}\n * \n * @author $Id: ee98973025874319c4fcbc449e8d4b7b9a3d1321 $\n */\n@Version(\"1.5\")\npackage org.osgi.service.log;\n\nimport org.osgi.annotation.versioning.Version;",
+      "rationale": "Canonical package-info.java: @Version annotation as the semantic contract plus javadoc documenting asymmetric consumer/provider import ranges."
+    },
+    {
+      "patternId": "tck-in-framework-junit",
+      "primary": true,
+      "path": "org.osgi.test.cases.event/bnd.bnd",
+      "lines": [1, 31],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.test.cases.event/bnd.bnd#L1-L31",
+      "excerpt": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/osgi.tck.junit-platform.bnd, ${includes}/tck.bnd, ${includes}/cmpn.bnd\n\nBundle-Description\t\t\t\t\t: A test case for the event generic mechanism implementation.\n\n-conditionalpackage\t\t\t\t\t= org.osgi.test.support.*\n-privatepackage\t\t\t\t\t\t=  \\\n\t${p}.junit\nExport-Package\t\t\t\t\t\t= \\\n\t${p}.service\nImport-Package: ${-signaturetest}, *\n\n-includeresource\t\t\t\t\t= \\\n\ttb1.jar, \\\n\ttb2.jar\n\t\n-signaturetest                      = org.osgi.service.event\n\n-buildpath = \\\n    org.osgi.test.support;version=project, \\\n    org.osgi.framework;maven-scope=provided;version=1.8,\\\n    org.osgi.resource;maven-scope=provided;version=1.0,\\\n    org.osgi.util.tracker;maven-scope=provided;version=1.5,\\\n    org.osgi.namespace.implementation;version=1.0, \\\n    org.osgi.namespace.service;version=1.0, \\\n    org.osgi.service.event;version=latest\n\n-runbundles = \\\n\torg.osgi.impl.service.cm; version=latest, \\\n\torg.osgi.impl.service.event; version=latest, \\\n\torg.osgi.impl.service.log; version=latest",
+      "rationale": "Complete TCK project file: support classes via -conditionalpackage, embedded tb jars, signature test, RI under test in -runbundles."
+    },
+    {
+      "patternId": "tck-in-framework-junit",
+      "primary": false,
+      "path": "org.osgi.test.cases.event/src/org/osgi/test/cases/event/junit/EventTests.java",
+      "lines": [33, 52],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.test.cases.event/src/org/osgi/test/cases/event/junit/EventTests.java#L33-L52",
+      "excerpt": "public class EventTests extends OSGiTestCase {\n\n\tpublic void testIllegalTopics() {\n\t\tString[] illegalTopics = new String[] {\"\", \"*\", \"/error_topic\",\n\t\t\t\t\"//error_topic1\", \"\u00e9/error_topic2\", \"topic/error_topic3/\",\n\t\t\t\t\"error_topic&\", \"topic//error-topic4\", \"topic\\\\error_topic5\"};\n\t\tHashtable<String,Object> properties = new Hashtable<>();\n\t\t// illegal topics tested\n\t\tfor (int i = 0; i < illegalTopics.length; i++) {\n\t\t\tString topic = illegalTopics[i];\n\t\t\ttry {\n\t\t\t\tnew Event(topic, (Dictionary<String, ? >) properties);\n\t\t\t\tfail(\"Excepted IllegalArgumentException for topic:[\" + topic\n\t\t\t\t\t\t+ \"]\");\n\t\t\t}\n\t\t\tcatch (IllegalArgumentException e) {\n\t\t\t\t// expected\n\t\t\t}\n\t\t}\n\t}",
+      "rationale": "TCK test class: plain JUnit3-style methods on OSGiTestCase, exhaustive legal/illegal input matrices — spec-compliance style rather than unit style."
+    },
+    {
+      "patternId": "tck-in-framework-junit",
+      "primary": false,
+      "path": "org.osgi.test.support/src/org/osgi/test/support/OSGiTestCase.java",
+      "lines": [42, 66],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.test.support/src/org/osgi/test/support/OSGiTestCase.java#L42-L66",
+      "excerpt": "public abstract class OSGiTestCase extends TestCase {\n\tprivate volatile BundleContext context;\n\n\t/**\n\t * This method is called by the JUnit runner for OSGi, and gives us a Bundle\n\t * Context.\n\t */\n\tpublic void setBundleContext(BundleContext context) {\n\t\tthis.context = context;\n\t}\n\n\t/**\n\t * Returns the current Bundle Context\n\t */\n\tpublic BundleContext getContext() {\n\t\tBundleContext c = context;\n\t\tif (c == null) {\n\t\t\tBundle b = FrameworkUtil.getBundle(getClass());\n\t\t\tif ( b != null )\n\t\t\t\treturn context = b.getBundleContext();\n\n\t\t\tfail(\"No Bundle context set, are you running in OSGi Test mode?\");\n\t\t}\n\t\treturn c;\n\t}",
+      "rationale": "The TCK base class: BundleContext injected by the OSGi JUnit runner with FrameworkUtil fallback — the hinge between JUnit and the running framework."
+    },
+    {
+      "patternId": "impl-activator-servicefactory",
+      "primary": true,
+      "path": "org.osgi.impl.service.prefs/src/org/osgi/impl/service/prefs/Activator.java",
+      "lines": [33, 46],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.impl.service.prefs/src/org/osgi/impl/service/prefs/Activator.java#L33-L46",
+      "excerpt": "public class Activator\n\t\timplements BundleActivator, ServiceFactory<PreferencesService> {\n\tprivate static final String\tPREFERENCES_SERVICE\t= \"org.osgi.service.prefs.PreferencesService\";\n\tprivate BundleContext\t\tbundleContext\t\t= null;\n\n\t@Override\n\tpublic synchronized void start(\n\t\t\t@SuppressWarnings(\"hiding\") BundleContext bundleContext) {\n\t\tthis.bundleContext = bundleContext;\n\t\tDictionary<String,Object> properties = new Hashtable<>(4);\n\t\tproperties.put(\"Description\", \"The OSGi Preferences Service\");\n\t\tproperties.put(\"BackingStore\", \"file\");\n\t\tbundleContext.registerService(PREFERENCES_SERVICE, this, properties);\n\t}",
+      "rationale": "RI activator implementing ServiceFactory: per-consumer service scoping, descriptive service properties, registration by interface name."
+    },
+    {
+      "patternId": "bsn-gradle-bnd-workspace",
+      "primary": true,
+      "path": "gradle.properties",
+      "lines": [19, 36],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/gradle.properties#L19-L36",
+      "excerpt": "# JVM args to run gradle\norg.gradle.jvmargs=-Xms1g -Xmx3g\n\n# cnf project name\nbnd_cnf=cnf\n\n# bnd_version is the version of the Bnd Gradle plugin\nbnd_version=7.1.0\n\n# The URLs to the repos for the Bnd Gradle plugin\nbnd_snapshots=https://bndtools.jfrog.io/bndtools/libs-snapshot-local\nbnd_releases=https://bndtools.jfrog.io/bndtools/libs-release-local\n\n# bnd_build can be set to the name of a primary project whose dependencies will seed the set of projects to build.\nbnd_build=osgi.build\n\n# Default gradle task to build\nbnd_defaultTask=assemble",
+      "rationale": "Entire Gradle-side configuration of a ~190-project bnd workspace: plugin version, cnf name, seed project, default task — nothing else needed."
+    },
+    {
+      "patternId": "central-cnf-includes-config",
+      "primary": false,
+      "path": "org.osgi.test.cases.event/bnd.bnd",
+      "lines": [1, 2],
+      "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+      "permalink": "https://github.com/osgi/osgi/blob/8c7184dad43779668052afe5b29a2a201e527b52/org.osgi.test.cases.event/bnd.bnd#L1-L2",
+      "excerpt": "# Set javac settings from JDT prefs\n-include: ${includes}/jdt.bnd, ${includes}/osgi.tck.junit-platform.bnd, ${includes}/tck.bnd, ${includes}/cmpn.bnd",
+      "rationale": "Include-layer composition in a TCK project: jdt + junit-platform + tck + cmpn layers stacked in one line."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "ki_repo": "https://github.com/peterkir/ki",
+  "ref": "main",
+  "sha": "1c625e5bf28b0faf2fdd6dea61e93ca5db846105",
+  "timestamp": "2026-08-11T12:22:40Z",
+  "write_target": ".copilot",
+  "interview": {
+    "name": "bnd-workspace-template",
+    "description": "",
+    "languages": ["osgi"],
+    "always_on_skills": ["caveman","system-analysis","grilling","to-spec"],
+    "caveman_intensity": "full",
+    "tools": ["JAVA_HOME=/c/Users/pekirsc/.ecdev/java/ee/JAVA17","JAVA_BIN=/c/Users/pekirsc/.ecdev/java/ee/JAVA17/bin/java"]
+  }
+}
