@@ -1,0 +1,85 @@
+{
+  "buildSystem": {
+    "primary": "maven",
+    "wrapper": "mvnw / mvnw.cmd",
+    "manifestGeneration": "bnd-maven-plugin",
+    "integrationTesting": "bnd-testing-maven-plugin (surefire skipped: skipTests=true, pom.xml L285)",
+    "resolution": "bnd-resolver-maven-plugin computes -runbundles",
+    "baselining": "bnd-baseline-maven-plugin"
+  },
+  "versions": {
+    "java.release": "8",
+    "bnd": "6.4.0",
+    "junit-jupiter.compile": "5.8.2",
+    "junit-jupiter": "5.10.2",
+    "junit-platform": "1.10.2",
+    "assertj.compile": "3.23.1",
+    "assertj": "3.24.2",
+    "awaitility": "4.3.0",
+    "osgi.core.buildpath": "8.0.0"
+  },
+  "coordinates": {
+    "groupId": "org.osgi",
+    "parentArtifactId": "org.osgi.test.parent",
+    "versionScheme": "${revision} (CI-friendly flattened versions)"
+  },
+  "directoryTopology": {
+    "org.osgi.test.common": "shared utilities: dictionary, filter, install, service, bitmaps",
+    "org.osgi.test.junit5": "JUnit5 extensions + injection annotations (org.osgi.test.common.annotation lives here)",
+    "org.osgi.test.junit4": "JUnit4 rule-based variant (test-junit4.bndrun, test-vintage.bndrun)",
+    "org.osgi.test.junit5.cm": "ConfigurationAdmin-aware JUnit5 extension",
+    "org.osgi.test.junit5.listeners.log.osgi": "test-execution listener logging to OSGi Log",
+    "org.osgi.test.junit5.featurelauncher": "Feature Launcher support (not in root pom modules list)",
+    "org.osgi.test.assertj.framework": "AssertJ assertions for Bundle/BundleContext/DTO/ServiceReference",
+    "org.osgi.test.assertj.feature": "AssertJ assertions for Feature Service",
+    "org.osgi.test.assertj.log": "AssertJ assertions for OSGi Log entries",
+    "org.osgi.test.assertj.promise": "AssertJ assertions for OSGi Promises",
+    "org.osgi.test.bom": "Bill of Materials aggregating released artifacts",
+    "examples/": "3 consumption modes: bndworkspace, gradle, mvn",
+    "docs/": "Jekyll site (_config.yml + index.md)"
+  },
+  "moduleNaming": "directory name == Bundle-SymbolicName (BSN-as-folder convention)",
+  "entryPoints": [
+    "org.osgi.test.junit5 (main artifact consumers depend on for JUnit5)",
+    "org.osgi.test.common (transitively shared utilities)",
+    "org.osgi.test.bom (version alignment for consumers)"
+  ],
+  "testLayout": {
+    "unitAndIntegration": "src/test/java per module; ALL tests run inside OSGi framework via bnd-testing-maven-plugin",
+    "bndruns": [
+      "org.osgi.test.common/test.bndrun",
+      "org.osgi.test.junit5/test.bndrun",
+      "org.osgi.test.junit4/test-junit4.bndrun",
+      "org.osgi.test.junit4/test-vintage.bndrun",
+      "org.osgi.test.junit5.cm/test.bndrun",
+      "org.osgi.test.junit5.listeners.log.osgi/test.bndrun",
+      "org.osgi.test.assertj.feature/test.bndrun",
+      "org.osgi.test.assertj.framework/test.bndrun",
+      "org.osgi.test.assertj.log/test.bndrun",
+      "org.osgi.test.assertj.promise/test.bndrun"
+    ]
+  },
+  "ci": {
+    "workflows": ["cibuild.yml", "codeql-analysis.yml", "examples-build.yml", "stale.yml"],
+    "note": "examples built by separate workflow from library reactor"
+  },
+  "license": "Apache-2.0",
+  "graph": {
+    "tool": "graphify 0.9.38 (AST-only pass)",
+    "nodeCount": 3723,
+    "edgeCount": 11071,
+    "communityCount": 245,
+    "godNodes": [
+      { "label": "ServiceAware", "degree": 104, "note": "core service-arrival abstraction — validates canonical PlayerTest selection" },
+      { "label": "MapStream", "degree": 92, "note": "internal map-stream utility hub in org.osgi.test.common" },
+      { "label": "OSGiSoftAssertions", "degree": 82 },
+      { "label": "FeatureLaunchCapture", "degree": 78 },
+      { "label": "BundleInstaller", "degree": 72 },
+      { "label": "WithConfiguration", "degree": 66, "note": "junit5.cm ConfigAdmin annotation — flagged missing section" }
+    ],
+    "surpriseEdges": [
+      { "from": "Demo_10_LifeCycle (examples/mvn)", "to": "ServiceAware", "relation": "references" },
+      { "from": "Demo_13_Config_AnnotationsInAnnotation (examples/mvn)", "to": "WithFactoryConfiguration (junit5.cm)", "relation": "references", "note": "mvn example demos exercise ConfigAdmin annotations — richer than bndworkspace example" }
+    ]
+  }
+}

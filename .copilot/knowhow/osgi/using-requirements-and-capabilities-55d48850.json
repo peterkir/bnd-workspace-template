@@ -1,0 +1,18 @@
+{
+  "id": "using-requirements-and-capabilities-55d48850",
+  "language": "osgi",
+  "targetFile": "docs/languages/osgi/knowhow/using-requirements-and-capabilities-55d48850.md",
+  "sources": [
+    {
+      "ref": "https://blog.osgi.org/2015/12/using-requirements-and-capabilities.html",
+      "title": "Using Requirements and Capabilities",
+      "author": "Ray Auge",
+      "publishedAt": "2015-12-01",
+      "accessedAt": "2026-08-10T00:00:00Z"
+    }
+  ],
+  "conflicts": [],
+  "confidence": 0.95,
+  "updatedAt": "2026-08-10T00:00:00Z",
+  "generatedBy": "ref-doc/1"
+}

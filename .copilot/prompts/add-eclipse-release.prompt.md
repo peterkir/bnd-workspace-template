@@ -9,82 +9,75 @@ description: >
 
 # add-eclipse-release
 
-Add configuration files for a new Eclipse Platform release and/or SimRel release to the
-bnd-workspace-template repository.
+Add Eclipse Platform and/or SimRel repository fragments with selectable P2 and
+indexed OSGi repository backends.
 
 ## Inputs
 
-- `<pv>` — platform version, e.g. `4.38`
-- `<sv>` — SimRel version, e.g. `2025-12`
+- `<pv>` - platform version, for example `4.40`
+- `<sv>` - SimRel version, for example `2026-06`
 
-Either can be supplied alone (e.g. platform released but SimRel not yet), or both together.
+Either value can be supplied alone.
 
-## Repository structure
+## Fragment structure
+
+Each release fragment contains the repository configuration, its switch, and,
+for indexed mode, a checked-in OSGi repository index:
 
 ```
 eclipse_<pv>_platform/cnf/ext/eclipse_<pv>_platform.bnd
+eclipse_<pv>_platform/cnf/ext/eclipse-repo-config.bnd
+eclipse_<pv>_platform/cnf/ext/eclipse_${eclipse.platform.version.<pv>}_platform_p2.index.xml.gz/index.xml.gz
+
 eclipse_<pv>_simrel_<sv>/cnf/ext/eclipse_<pv>_simrel_<sv>.bnd
+eclipse_<pv>_simrel_<sv>/cnf/ext/eclipse-repo-config.bnd
+eclipse_<pv>_simrel_<sv>/cnf/ext/eclipse_${eclipse.platform.version.<pv>}_simrel_${eclipse.simrel.version.<sv>}_p2.index.xml.gz/index.xml.gz
 ```
 
-## Key facts (verified)
+`cnf/ext` files load automatically in a bnd workspace. Create
+`eclipse-repo-config.bnd` with:
 
-- Platform update sites and SimRel repositories are both served from `download.eclipse.org`
-  (NOT `archive.eclipse.org` — directory listing on download.eclipse.org is off, but the
-  composite repository files work fine and are the reliable, default source for every
-  version, old and new).
-- Composite metadata is published as a **jar**, not a plain `.xml` file:
-  `compositeContent.xml` returns 404 — the real file is `compositeContent.jar`
-  (a zip containing `compositeContent.xml`).
-- `p2.index` merely confirms the repository exists; the actual release timestamp/reltag
-  must be read from the `child location` entries inside `compositeContent.jar`.
+```properties
+useIndexed = true
+```
 
-## Step-by-step
+`useIndexed=true` selects the checked-in `OSGiRepository`. Set it to `false`
+to select the remote `P2Repository`. Both `-plugin.*` properties must remain
+active; their values use the switch to expose only one backend.
 
-### 1. Verify the repository exists via p2.index
+## Release metadata
+
+Platform update sites and SimRel repositories use `download.eclipse.org`.
+Verify each repository before creating its fragment:
 
 ```bash
 curl -Lk -s -o /dev/null -w "%{http_code}" \
-  "https://download.eclipse.org/eclipse/updates/<pv>/p2.index"     # platform, expect 200
+  "https://download.eclipse.org/eclipse/updates/<pv>/p2.index"
 curl -Lk -s -o /dev/null -w "%{http_code}" \
-  "https://download.eclipse.org/releases/<sv>/p2.index"            # simrel, expect 200
+  "https://download.eclipse.org/releases/<sv>/p2.index"
 ```
 
-### 2. Download and extract compositeContent.jar to find the timestamp
-
-**Platform:**
-```bash
-cd /tmp && rm -rf cc_platform && mkdir cc_platform && cd cc_platform
-curl -Lk -s "https://download.eclipse.org/eclipse/updates/<pv>/compositeContent.jar" -o compositeContent.jar
-unzip -o -q compositeContent.jar
-cat compositeContent.xml
-```
-Look for `<child location='R-<pv>-<timestamp>'/>` — this is the platform reltag.
-Example (4.38): `<child location='R-4.38-202512010920'/>`
-
-**SimRel:**
-```bash
-cd /tmp && rm -rf cc_simrel && mkdir cc_simrel && cd cc_simrel
-curl -Lk -s "https://download.eclipse.org/releases/<sv>/compositeContent.jar" -o compositeContent.jar
-unzip -o -q compositeContent.jar
-cat compositeContent.xml
-```
-The SimRel composite typically lists **two** children — a relative EPP-packages path
-(`../../technology/epp/packages/<sv>/`, ignore it) and the real timestamp
-(pure 12 digits, e.g. `202512101000`). Pick the pure-digit one.
-
-### 3. Verify the platform reltag format
-
-The reltag directory must be `R-<pv>-<timestamp>` where `<pv>` are the leading digits
-(dots kept, e.g. `4.38`) and `<timestamp>` is a 12-digit suffix:
+Read release timestamps from `compositeContent.jar`, not
+`compositeContent.xml`:
 
 ```bash
-reltag="R-<pv>-<timestamp>"
-[[ "$reltag" =~ ^R-<pv>-([0-9]{12})$ ]] && echo "OK: $BASH_REMATCH[1]" || echo "FAIL"
+work=$(mktemp -d)
+curl -Lk -s "https://download.eclipse.org/eclipse/updates/<pv>/compositeContent.jar" \
+  -o "$work/platform.jar"
+unzip -p "$work/platform.jar" compositeContent.xml
+curl -Lk -s "https://download.eclipse.org/releases/<sv>/compositeContent.jar" \
+  -o "$work/simrel.jar"
+unzip -p "$work/simrel.jar" compositeContent.xml
+rm -rf "$work"
 ```
 
-### 4. Create the platform bnd file
+The platform child location has the form `R-<pv>-<timestamp>`. SimRel
+metadata normally contains an EPP relative path and one pure 12-digit
+location; use the pure-digit location.
 
-`eclipse_<pv>_platform/cnf/ext/eclipse_<pv>_platform.bnd`:
+## Platform configuration
+
+Create `eclipse_<pv>_platform/cnf/ext/eclipse_<pv>_platform.bnd`:
 
 ```bnd
 # Eclipse Platform Release repository
@@ -92,36 +85,79 @@ eclipse.platform.baseurl = https://download.eclipse.org/eclipse/updates
 
 eclipse.platform.version.<pv> = <pv>
 eclipse.platform.reltag.R-<pv>-<timestamp> = R-<pv>-<timestamp>
-
--plugin.p2.eclipse.platform_<pv>: \
+eclipse.p2.repository.<pv>: \
     aQute.bnd.repository.p2.provider.P2Repository; \
-       name  = 'Eclipse P2 Platform ${eclipse.platform.version.<pv>}'; \
-       url   = '${eclipse.platform.baseurl}/${eclipse.platform.version.<pv>}'
+        name     = 'Eclipse P2 Platform ${eclipse.platform.version.<pv>}'; \
+        url      = '${eclipse.platform.baseurl}/${eclipse.platform.version.<pv>}'; \
+        location = '${.}/eclipse_${eclipse.platform.version.<pv>}_platform_p2.index.xml.gz'
+eclipse.osgi.repository.<pv>: \
+    aQute.bnd.repository.osgi.OSGiRepository; \
+        name      = 'Eclipse Platform ${eclipse.platform.version.<pv>}'; \
+        locations = '${fileuri;${.}/eclipse_${eclipse.platform.version.<pv>}_platform_p2.index.xml.gz/index.xml.gz}'; \
+        cache     = '${build}/cache/ecl_${eclipse.platform.version.<pv>}'
+
+-plugin.p2.eclipse.platform_<pv>: ${if;${useIndexed};;${eclipse.p2.repository.<pv>}}
+-plugin.osgi.eclipse.platform_<pv>: ${if;${useIndexed};${eclipse.osgi.repository.<pv>};}
 ```
 
-Note: the P2Repository `url` uses the **composite** URL (no reltag subpath) — bnd resolves
-the actual release via the composite repository automatically. The reltag variable is kept
-purely for provenance/documentation.
+## SimRel configuration
 
-### 5. Create the SimRel bnd file
-
-`eclipse_<pv>_simrel_<sv>/cnf/ext/eclipse_<pv>_simrel_<sv>.bnd`:
+Create `eclipse_<pv>_simrel_<sv>/cnf/ext/eclipse_<pv>_simrel_<sv>.bnd`:
 
 ```bnd
-# Eclipse Simultaneous Release repository 
+# Eclipse Simultaneous Release repository
 eclipse.simrel.baseurl = https://download.eclipse.org/releases
 
-eclipse.platform.version.<pv>      = <pv>
-eclipse.simrel.version.<sv>        = <sv>
-eclipse.simrel.reltag.<timestamp>  = <timestamp>
-
--plugin.p2.eclipse.simrel_<sv>: \
+eclipse.platform.version.<pv> = <pv>
+eclipse.simrel.version.<sv> = <sv>
+eclipse.simrel.reltag.<timestamp> = <timestamp>
+eclipse.p2.repository.<sv>: \
     aQute.bnd.repository.p2.provider.P2Repository; \
-       name  = 'Eclipse P2 SimRel ${eclipse.platform.version.<pv>}/${eclipse.simrel.version.<sv>}'; \
-       url   = '${eclipse.simrel.baseurl}/${eclipse.simrel.version.<sv>}'
+        name     = 'Eclipse P2 SimRel ${eclipse.platform.version.<pv>}/${eclipse.simrel.version.<sv>}'; \
+        url      = '${eclipse.simrel.baseurl}/${eclipse.simrel.version.<sv>}'; \
+        location = '${.}/eclipse_${eclipse.platform.version.<pv>}_simrel_${eclipse.simrel.version.<sv>}_p2.index.xml.gz'
+eclipse.osgi.repository.<sv>: \
+    aQute.bnd.repository.osgi.OSGiRepository; \
+        name      = 'Eclipse SimRel ${eclipse.platform.version.<pv>}/${eclipse.simrel.version.<sv>}'; \
+        locations = '${fileuri;${.}/eclipse_${eclipse.platform.version.<pv>}_simrel_${eclipse.simrel.version.<sv>}_p2.index.xml.gz/index.xml.gz}'; \
+        cache     = '${build}/cache/ecl_${eclipse.platform.version.<pv>}'
+
+-plugin.p2.eclipse.simrel_<sv>: ${if;${useIndexed};;${eclipse.p2.repository.<sv>}}
+-plugin.osgi.eclipse.simrel_<sv>: ${if;${useIndexed};${eclipse.osgi.repository.<sv>};}
 ```
 
-## Version history (for reference)
+The P2 `location` is a macro-derived directory whose name ends in
+`_p2.index.xml.gz`. bnd writes `index.xml.gz` and downloaded bundles below it;
+the suffix is part of the directory name, not the final generated file. The
+OSGi `locations` value points to that exact generated index in the same
+directory.
+
+## Creating the checked-in index
+
+To create or refresh an indexed release, use a temporary bnd workspace with an
+empty `cnf/build.bnd`, set `useIndexed=false`, and access the repository:
+
+```bash
+java -jar "$HOME/biz.aQute.bnd.jar" repo -w <temporary-release-workspace> list
+```
+
+Keep the generated file from the P2 cache directory at the configured location:
+
+```text
+cnf/ext/eclipse_${eclipse.platform.version.<pv>}_platform_p2.index.xml.gz/index.xml.gz
+```
+
+Remove downloaded bundle files from the P2 cache directory, restore
+`useIndexed=true`, and verify that the indexed backend loads:
+
+```bash
+java -jar "$HOME/biz.aQute.bnd.jar" repo -w <release-workspace> list
+```
+
+Do not add generated cache directories or conversion markers to release
+fragments.
+
+## Version history
 
 | Platform | SimRel  | Platform reltag           | SimRel reltag   |
 |----------|---------|----------------------------|-----------------|
@@ -136,8 +172,4 @@ eclipse.simrel.reltag.<timestamp>  = <timestamp>
 | 4.38     | 2025-12 | R-4.38-202512010920         | 202512101000    |
 | 4.39     | 2026-03 | R-4.39-202602260420         | 202603111000    |
 | 4.40     | 2026-06 | R-4.40-202606010713         | 202606101000    |
-
-## After adding files
-
-Append the new row to the version history table above so future runs of this skill have
-an up-to-date reference.
+```

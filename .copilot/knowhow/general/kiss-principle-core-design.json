@@ -1,0 +1,16 @@
+{
+  "id": "kiss-principle-core-design",
+  "language": "general",
+  "targetFile": "docs/general/knowhow/kiss-principle-core-design.md",
+  "sources": [
+    {
+      "ref": "seed:manual-bootstrap",
+      "title": "Seed entry",
+      "accessedAt": "2026-08-10T00:00:00Z"
+    }
+  ],
+  "conflicts": [],
+  "confidence": 0.98,
+  "updatedAt": "2026-08-10T00:00:00Z",
+  "generatedBy": "ref-doc/1"
+}

@@ -1,0 +1,22 @@
+{
+  "source": "https://github.com/osgi/osgi",
+  "sourceType": "local-dir",
+  "localPath": "C:/git/github.com/osgi/osgi",
+  "repoSlug": "osgi",
+  "language": "osgi",
+  "ref": "main",
+  "commit": "8c7184dad43779668052afe5b29a2a201e527b52",
+  "dirty": false,
+  "extractedAt": "2026-08-10T07:10:00Z",
+  "toolVersion": "ref-repo/1",
+  "graphify": "0.9.38",
+  "confidence": 0.85,
+  "missingSections": [
+    "osgi.specs docbook build pipeline internals (xsl/fop toolchain not analyzed)",
+    "individual domain TCKs beyond event (dmt, zigbee, enocean, onem2m, upnp suites not deeply analyzed)",
+    "licensed/ prebuilt binary repo contents (only listed, not inspected)",
+    "dmforest/, json.schema/, xmlns/ auxiliary trees",
+    "signature-test plugin implementation (osgi.build workspace plugins)"
+  ],
+  "history": []
+}

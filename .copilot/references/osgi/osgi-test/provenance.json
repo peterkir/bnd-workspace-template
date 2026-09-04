@@ -1,0 +1,21 @@
+{
+  "source": "https://github.com/eclipse-osgi-technology/osgi-test",
+  "sourceType": "url",
+  "repoSlug": "osgi-test",
+  "language": "osgi",
+  "ref": "main",
+  "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce",
+  "dirty": false,
+  "extractedAt": "2026-08-10T00:00:00Z",
+  "toolVersion": "ref-repo/1",
+  "graphify": "0.9.38",
+  "confidence": 0.9,
+  "missingSections": [
+    "org.osgi.test.junit4 internals (rule-based variant not deeply analyzed)",
+    "org.osgi.test.junit5.cm configuration-admin extension internals",
+    "org.osgi.test.junit5.featurelauncher module (outside default maven reactor)"
+  ],
+  "history": [
+    { "commit": "696b03cd2eaf4e91f7ad0e3d424e4bebb28525ce", "extractedAt": "2026-08-09T00:00:00Z", "note": "initial extraction, no graph layer" }
+  ]
+}
